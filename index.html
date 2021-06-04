@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <!-- Vuejs: development version, includes helpful console warnings -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+
+    <!-- Vuejs: production version, optimized for size and speed -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
     <title>Autoilumittari-sovellus</title>
   </head>
+  
   <body>
 
     <!-- Main app begins here -->
@@ -34,7 +40,7 @@
         </div>
 
         <div id="right">
-          <input type="number" v-model="travelDistance" /> <span>{{ travelDistanceErrMsg }}</span>
+          <input type="number" v-model="travelDistance" @focus="$event.target.select()" /> <span>{{ travelDistanceErrMsg }}</span>
         </div><hr />
 
         <div id="left">
@@ -42,7 +48,7 @@
         </div>
   
         <div id="right">
-          <input type="number" v-model="speedA" /> <span>{{ speedAErrMsg }}</span>
+          <input type="number" v-model="speedA" @focus="$event.target.select()" /> <span>{{ speedAErrMsg }}</span>
         </div><hr />
 
         <div id="left">
@@ -50,7 +56,7 @@
         </div>
 
         <div id="right">
-          <input type="number" v-model="speedB" /> <span>{{ speedBErrMsg }}</span>
+          <input type="number" v-model="speedB" @focus="$event.target.select()" /> <span>{{ speedBErrMsg }}</span>
         </div><hr />
 
         <div id="bottom">
@@ -60,9 +66,31 @@
       </div>
       <!-- Form ends here -->
 
+      <br />
 
-      <span v-html="results"></span>
-
+      <!-- Results begins here -->
+      <div class="results" v-if="resultsVisible">
+        <div id="left">
+          <span v-html="results[0]"></span>
+        </div>
+        <div id="right">
+          <span v-html="results[1]"></span>
+        </div><hr />
+        <div id="center">
+          <strong><span v-html="results[2]"></span></strong>
+        </div><hr />
+        
+        <div id="left">
+          <span v-html="results[3]"></span>
+        </div>
+        <div id="right">
+          <span v-html="results[4]"></span>
+        </div><hr />
+        <div id="center">
+          <strong><span v-html="results[5]"></span></strong>
+        </div><hr />
+      </div>
+      <!-- Results ends here -->
 
     </div>
     <!-- Main app ends here -->
@@ -70,4 +98,5 @@
   </body>
 
   <script src="./app.js"></script>
+
 </html>

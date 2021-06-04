@@ -1,5 +1,3 @@
-
-
 const app = new Vue({
   el: "#app",
 
@@ -17,7 +15,8 @@ const app = new Vue({
     speedAErrMsg: "",
     speedB: 0.0,
     speedBErrMsg: "",
-    results: "",
+    results: [],  // Results are stored in array
+    resultsVisible: false,
   },
 
   methods: {
@@ -31,10 +30,11 @@ const app = new Vue({
       this.speedAErrMsg = "";
       this.speedB = 0.0;
       this.speedBErrMsg = "";
-      this.results = "";
+      this.results = [];
+      this.resultsVisible = false;
     },
 
-    // Calculate travel times and gas consumptions
+    // Calculate travel times and gas consumptions and store them into results-array
     calculate: function() {
       this.travelDistance = parseInt(this.travelDistance);
       this.speedA = parseInt(this.speedA);
@@ -77,27 +77,64 @@ const app = new Vue({
           return;
       }
 
+      // Set results area visible
+      this.resultsVisible = true;
+      this.results = [];
+
+      // Calculate travel times and gas consumptions
       const travelTimeA = this.travelDistance / this.speedA;
       const travelTimeB = this.travelDistance / this.speedB;
-      const gasConsumptionA = gasConsumption(this.carTypes.find(element => element.value === this.carType).consumption, this.speedA, this.travelDistance);
-      const gasConsumptionB = gasConsumption(this.carTypes.find(element => element.value === this.carType).consumption, this.speedB, this.travelDistance);
 
-      this.results  = "Matka-aika matkanopeudella A on " + convertNumToTime(travelTimeA) + ".<br />";
-      this.results += "Matka-aika matkanopeudella B on " + convertNumToTime(travelTimeB) + ".<br />";
+      const gasConsumptionA = gasConsumption(
+        this.carTypes.find(element => element.value === this.carType).consumption, this.speedA, this.travelDistance);
 
-      if (travelTimeA <= travelTimeB)
-        this.results += "Matkanopeus A on " + convertNumToTime(travelTimeB - travelTimeA, "minuutin") + " nopeampi.<br />";
+      const gasConsumptionB = gasConsumption(
+        this.carTypes.find(element => element.value === this.carType).consumption, this.speedB, this.travelDistance);
+
+
+      this.results.push("Matka-aika matkanopeudella A (" + this.speedA + " km/h) on " + convertNumToTime(travelTimeA) + ".");
+      this.results.push("Matka-aika matkanopeudella B (" + this.speedB + " km/h) on " + convertNumToTime(travelTimeB) + ".");
+
+      // Compare travel times
+      if (travelTimeA == travelTimeB)
+        this.results.push(
+          "Matkanopeudet A (" + this.speedA + " km/h) ja B (" + this.speedB +
+          " km/h) ovat yhtä nopeat (" + convertNumToTime(travelTimeA) + ")."
+        );
+
+      else if (travelTimeA < travelTimeB)
+        this.results.push(
+          "Matkanopeus A (" + this.speedA + " km/h) on " + convertNumToTime(travelTimeB - travelTimeA, "minuutin", "tunnin") +
+          " nopeampi kuin matkanopeus B (" + this.speedB + " km/h)."
+        );
+
       else
-        this.results += "Matkanopeus B on " + convertNumToTime(travelTimeA - travelTimeB, "minuutin") + " nopeampi.<br />";
+        this.results.push(
+          "Matkanopeus B (" + this.speedB + " km/h) on " + convertNumToTime(travelTimeA - travelTimeB, "minuutin", "tunnin") +
+          " nopeampi kuin matkanopeus A (" + this.speedA + " km/h)."
+        );
 
-      this.results += "Kulutus matkanopeudella A on " + gasConsumptionA.toFixed(2) + " litraa.<br />";
-      this.results += "Kulutus matkanopeudella B on " + gasConsumptionB.toFixed(2) + " litraa.<br />";
+      this.results.push("Kulutus matkanopeudella A (" + this.speedA + " km/h) on " + gasConsumptionA.toFixed(2) + " litraa.");
+      this.results.push("Kulutus matkanopeudella B (" + this.speedB + " km/h) on " + gasConsumptionB.toFixed(2) + " litraa.");
 
-      if (gasConsumptionA <= gasConsumptionB)
-        this.results += "Kulutus matkanopeudella A on " + (gasConsumptionB - gasConsumptionA).toFixed(2) + " litraa vähemmän.<br />";
+      // Compare gas consumptions
+      if (gasConsumptionA == gasConsumptionB)
+        this.results.push(
+          "Kulutus matkanopeuksilla A (" + this.speedA + " km/h) ja B (" + this.speedB +
+          " km/h) on yhtä paljon (" + (gasConsumptionA).toFixed(2) + " litraa)."
+        );
+
+      else if (gasConsumptionA < gasConsumptionB)
+        this.results.push(
+          "Kulutus matkanopeudella A (" + this.speedA + " km/h) on " + (gasConsumptionB - gasConsumptionA).toFixed(2) +
+          " litraa vähemmän kuin matkanopeudella B (" + this.speedB + " km/h)."
+        );
+
       else
-        this.results += "Kulutus matkanopeudella B on " + (gasConsumptionA - gasConsumptionB).toFixed(2) + " litraa vähemmän.<br />";
-
+        this.results.push(
+          "Kulutus matkanopeudella B (" + this.speedB + " km/h) on " + (gasConsumptionA - gasConsumptionB).toFixed(2) +
+          " litraa vähemmän kuin matkanopeudella A (" + this.speedA + " km/h)."
+        );
     }
   }
 })
@@ -108,7 +145,7 @@ const gasConsumption = (consumptionPer100km, speed, distance) => {
   const slope = 1.009;
   let result = consumptionPer100km;
 
-  // TODO:
+  // TODO: better ways to calculate it?
   for (i = 1; i < speed; ++i)
     result *= slope;
 
@@ -118,7 +155,7 @@ const gasConsumption = (consumptionPer100km, speed, distance) => {
 
 // Based on this example: https://speedysense.com/convert-float-to-time-in-javascript/
 // Converts float to hours and minutes with appropriate spelling
-const convertNumToTime = (number, minutesSpellingSpecialCase = "minuutti") => {
+const convertNumToTime = (number, minutesSpellingSpecialCase = "minuutti", hoursSpellingSpecialCase = "tunti") => {
 
   // Separate the int from the decimal part
   let hour = Math.floor(number);
@@ -133,7 +170,7 @@ const convertNumToTime = (number, minutesSpellingSpecialCase = "minuutti") => {
 
   let hoursSpelling = "tuntia", minutesSpelling = "minuuttia";
   if (hour == 1)
-    hoursSpelling = "tunti";
+    hoursSpelling = hoursSpellingSpecialCase;
   if (minute == 1)
     minutesSpelling = minutesSpellingSpecialCase;
 
