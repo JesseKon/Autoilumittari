@@ -1,0 +1,60 @@
+/**
+ * Color theme:
+ * #63664E
+ * #D9EA6C
+ * #DEE6AE
+ * #5E6B0B
+ * #AFB58A
+ */
+
+body {
+  background-color: #DEE6AE;
+  color: #63664E;
+}
+
+h1 {
+  text-align: center;
+}
+
+input, select, button {
+  background-color: #AFB58A;
+  border-color: #63664E;
+  border-width: 1px;
+  color: #63664E;
+}
+
+.form {
+  display: flex;
+  flex-flow: row wrap;
+  margin: auto;
+  width: 80%;
+  justify-content: space-between;
+}
+
+.form > #left {
+  flex: 1;
+  padding: 4px;
+  background-color: #AFB58A;
+  text-align: right;
+}
+
+.form > #right {
+  flex: 2;
+  padding: 4px;
+  background-color: #AFB58A;
+  text-align: left;
+}
+
+.form > hr {
+  border: none;
+  width: 100%;
+  margin: 0px;
+  padding: 2px 0px 2px 0px;
+}
+
+.form > #bottom {
+  flex: 3;
+  padding: 4px;
+  background-color: #AFB58A;
+  text-align: center;
+}
